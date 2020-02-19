@@ -1,10 +1,51 @@
 {
-  "users" : [
-    {userId: 1, displayName: 'Guillaume Maka', username: 'guillaumemaka', password: '111111', roles: ['ADMIN']},
-    {userId: 2, displayName: 'Guillaume Maka', username: 'MAKG03118501', password: '111111', roles: ['STUDENT']},
-    {userId: 3, displayName: 'Martin Tremblay', username: 'martin.tremblay', password: '809000', roles: ['ADMIN']},
-    {userId: 4, displayName: 'Martin Michelle', username: 'MARM03118501', password: '809000', email: 'martin.michelle@uqtr.ca', roles: ['STUDENT']},
-    {userId: 5, displayName: 'Idrick Wilfrield', username: 'KUII25049700', password: '222222', roles: ['ADMIN']},
-  ],
-  "activities: []
+   "users": [
+      {
+         "userId": 1,
+         "displayName": "Guillaume Maka",
+         "username": "guillaumemaka",
+         "password": "111111",
+         "roles": [
+            "ADMIN"
+         ]
+      },
+      {
+         "userId": 2,
+         "displayName": "Guillaume Maka",
+         "username": "MAKG03118501",
+         "password": "111111",
+         "roles": [
+            "STUDENT"
+         ]
+      },
+      {
+         "userId": 3,
+         "displayName": "Martin Tremblay",
+         "username": "martin.tremblay",
+         "password": "809000",
+         "roles": [
+            "ADMIN"
+         ]
+      },
+      {
+         "userId": 4,
+         "displayName": "Martin Michelle",
+         "username": "MARM03118501",
+         "password": "809000",
+         "email": "martin.michelle@uqtr.ca",
+         "roles": [
+            "STUDENT"
+         ]
+      },
+      {
+         "userId": 5,
+         "displayName": "Idrick Wilfrield",
+         "username": "KUII25049700",
+         "password": "222222",
+         "roles": [
+            "ADMIN"
+         ]
+      }
+   ],
+   "activities": []
 }
