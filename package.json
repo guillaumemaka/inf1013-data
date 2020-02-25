@@ -6,6 +6,7 @@
   "author": "Guillaume Maka <guillaume.maka@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "faker": "4.1.0",
     "json-server": "0.16.1"
   }
 }
