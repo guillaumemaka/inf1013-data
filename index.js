@@ -1,8 +1,38 @@
 const faker = require('faker')
+const mung = require('express-mung')
 const jsonServer = require('json-server')
 const server = jsonServer.create()
 const router = jsonServer.router('db.json')
 const middlewares = jsonServer.defaults()
+
+function hasRole (role, obj) {
+  return obj.roles && Array.isArray(obj.roles) && obj.roles.indexOf(role) !== -1
+}
+
+function addExtraFields (req, res) {
+  if (Array.isArray(res.locals.data)) {
+    res.locals.data = res.locals.data.map(obj => {
+      obj.isAdmin = hasRole('ADMIN', obj)
+      obj.isStudent = hasRole('STUDENT', obj)
+      return obj
+    })
+  }
+}
+
+function removeSensitiveData (req, res) {
+  if (res.locals.data && res.locals.data.password) {
+    delete res.locals.data['password']
+  }
+
+  if (Array.isArray(res.locals.data)) {
+    res.locals.data = res.locals.data.map(o => {
+      if (o.password) {
+        delete o['password']
+      }
+      return o
+    })
+  }
+}
 
 server.use(middlewares)
 server.use(jsonServer.bodyParser)
@@ -13,7 +43,10 @@ server.post('/api/auth/login', (req, res) => {
   if (!user) {
     return res.status(404)
   }
-  return res.json({token: faker.random.uuid(), ...user})
+
+  const isAdmin = user.roles && user.roles.indexOf('ADMIN') !== -1
+
+  return res.json({token: faker.random.uuid(), isAdmin, ...user})
 })
 
 server.post('/api/auth/send-email-reset-password', (req, res) => {
@@ -43,6 +76,14 @@ server.post('/api/auth/reset-password', (req, res) => {
 
   return res.status(200)
 })
+
+// server.use(mung.json(addExtraFields))
+
+router.render = (req, res) => {
+  addExtraFields(req, res)
+  removeSensitiveData(req, res)
+  res.json(res.locals.data)
+}
 
 server.use('/api', router)
 

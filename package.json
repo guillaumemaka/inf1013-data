@@ -6,6 +6,7 @@
   "author": "Guillaume Maka <guillaume.maka@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "express-mung": "0.5.1",
     "faker": "4.1.0",
     "json-server": "0.16.1"
   }
