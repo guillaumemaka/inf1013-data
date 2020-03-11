@@ -120,7 +120,41 @@ function createUsers (n = 100) {
   return newUsers
 }
 
+function createActivities (n = 100) {
+  const activities = Array.from({length: n}, (_, k) => {
+    faker.seed(k)
+
+    const activity = {
+      id: faker.random.uuid(),
+      title: faker.lorem.words(4),
+      description: faker.lorem.paragraph(),
+      nbSeat: faker.random.number(40),
+      level: faker.random.arrayElement([
+        { code: 'D', name: 'No Knowledge' },
+        { code: 'C', name: 'Novice' },
+        { code: 'B', name: 'Advanced' },
+        { code: 'A', name: 'Fluent' }
+      ]),
+      type: faker.random.arrayElement([
+        'INDOOR', 'OUTDOOR'
+      ]),
+      registrations: [],
+      createdAt: faker.date.recent(5),
+      updatedAt: null
+    }
+
+    activity.startDate = faker.date.future(1, new Date())
+    activity.endDate = faker.date.future(1, activity.startDate)
+
+    return activity
+  })
+
+  return activities
+}
+
 module.exports = () => {
   defaults.users = [...defaults.users, ...createUsers()]
+  defaults.activities = createActivities()
+  defaults.tokens = []
   return defaults
 }

@@ -5,8 +5,12 @@ const server = jsonServer.create()
 const router = jsonServer.router(db())
 const middlewares = jsonServer.defaults()
 
+router.db._.mixin({
+  createId: () => faker.random.uuid()
+})
+
 function hasRole (role, obj) {
-  return obj.roles && Array.isArray(obj.roles) && obj.roles.indexOf(role) !== -1
+  return obj.hasOwnProperty('roles') && Array.isArray(obj.roles) && obj.roles.indexOf(role) !== -1
 }
 
 function addExtraFields (req, res) {
@@ -73,6 +77,100 @@ server.post('/api/auth/login', (req, res) => {
   const isAdmin = user.roles && user.roles.indexOf('ADMIN') !== -1
 
   return res.json({token: faker.random.uuid(), isAdmin, ...user})
+})
+
+server.get('/api/enrollments/:user_id', (req, res) => {
+  let { _page = 1, _start = 0, _limit = 15, _order = 'title', _sort = 'asc', _end = undefined } = req.query
+  const {user_id} = req.params
+  console.log(user_id)
+
+  const user = router.db.get('users').find({id: user_id}).value()
+
+  if (!user) {
+    return res.status(404)
+  }
+
+  let chain = router.db.get('activities')
+  .filter(o => {
+    return o.registrations && Array.isArray(o.registrations) && o.registrations.includes(user_id)
+  })
+
+  if (_sort) {
+    const _sortSet = _sort.split(',')
+    const _orderSet = (_order || '').split(',').map(s => s.toLowerCase())
+    chain = chain.orderBy(_sortSet, _orderSet)
+  }
+
+  // Slice result
+  if (_end || _limit || _page) {
+    res.setHeader('X-Total-Count', chain.size())
+    res.setHeader(
+      'Access-Control-Expose-Headers',
+      `X-Total-Count${_page ? ', Link' : ''}`
+    )
+  }
+
+  if (_page) {
+    _page = parseInt(_page, 10)
+    _page = _page >= 1 ? _page - 1 : 0
+    _limit = parseInt(_limit, 10) || 10
+
+    chain = chain.slice(_page, _limit)
+  } else if (_end) {
+    _start = parseInt(_start, 10) || 0
+    _end = parseInt(_end, 10)
+    chain = chain.slice(_start, _end)
+  } else if (_limit) {
+    _start = parseInt(_start, 10) || 0
+    _limit = parseInt(_limit, 10)
+    chain = chain.slice(_start, _start + _limit)
+  }
+
+  const items = chain.value()
+
+  return res.json({items, total: items.length})
+})
+
+server.get('/api/popular', (req, res) => {
+  let { _n = 5, _order = 'title', _sort = 'asc' } = req.query
+
+  let chain = router.db.get('activities')
+  .filter(o => {
+    return o.registrations && Array.isArray(o.registrations)
+  })
+  .sortBy(o => o.registrations.length)
+  .take(_n)
+
+  if (_sort) {
+    const _sortSet = _sort.split(',')
+    const _orderSet = (_order || '').split(',').map(s => s.toLowerCase())
+    chain = chain.orderBy(_sortSet, _orderSet)
+  }
+
+  const items = chain.value()
+
+  return res.json({items, total: items.length})
+})
+
+server.get('/api/recent', (req, res) => {
+  let { _n = 5, _order = 'title', _sort = 'asc' } = req.query
+
+  let chain = router.db.get('activities')
+  .filter(o => {
+    return o.registrations && Array.isArray(o.registrations)
+  })
+  .sortBy(o => o.registrations.length)
+  .take(_n)
+
+  if (_sort) {
+    const _sortSet = _sort.split(',')
+    const _orderSet = (_order || '').split(',').map(s => s.toLowerCase())
+    chain = chain.orderBy(_sortSet, _orderSet)
+  }
+
+  const items = chain.value()
+
+  return res.json({items, total: items.length})
 })
 
 server.post('/api/auth/send-email-reset-password', (req, res) => {
