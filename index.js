@@ -131,6 +131,32 @@ server.get('/api/enrollments/:user_id', (req, res) => {
   return res.json({items, total: items.length})
 })
 
+server.post('/api/enroll', (req, res) => {
+  const {userId, activityId} = req.body
+
+  const user = router.db.get('users').find({id: userId}).value()
+  const activity = router.db.get('activities').find({id: activityId}).value()
+
+  if (!user) {
+    return res.status(404).json({error: 'user not found!'})
+  }
+
+  if (!activity) {
+    return res.status(404).json({error: 'activity not found!'})
+  }
+
+  if (activity.registrations.includes(userId)) {
+    return res.status(200).json(activity)
+  }
+
+  const saved = router.db.get('activities')
+  .find({id: activityId})
+  .set('registrations', [...activity.registrations, userId])
+  .write()
+
+  return res.status(200).json(saved)
+})
+
 server.get('/api/popular', (req, res) => {
   let { _n = 5, _order = 'title', _sort = 'asc' } = req.query
 

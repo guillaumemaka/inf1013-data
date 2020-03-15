@@ -2,7 +2,36 @@ const faker = require('faker')
 
 const defaults = {
   'tokens': [],
+  'activities': [
+    {
+      'id': 'a_test1',
+      'title': faker.lorem.words(4),
+      'description': faker.lorem.paragraph(),
+      'nbSeat': faker.random.number(40),
+      'level': faker.random.arrayElement([
+        { 'code': 'D', 'name': 'No Knowledge' },
+        { 'code': 'C', 'name': 'Novice' },
+        { 'code': 'B', 'name': 'Advanced' },
+        { 'code': 'A', 'name': 'Fluent' }
+      ]),
+      'type': faker.random.arrayElement([
+        'INDOOR', 'OUTDOOR'
+      ]),
+      'registrations': [],
+      'createdAt': faker.date.recent(5),
+      'updatedAt': null
+    }
+  ],
   'users': [
+    {
+      'id': 'u_test1',
+      'displayName': 'Guillaume Maka',
+      'username': 'guillaumemaka',
+      'password': '111111',
+      'roles': [
+        'ADMIN'
+      ]
+    },
     {
       'id': faker.random.uuid(),
       'displayName': 'Guillaume Maka',
@@ -49,8 +78,7 @@ const defaults = {
         'ADMIN'
       ]
     }
-  ],
-  'activities': []
+  ]
 }
 
 function createMatricule (firstname, lastname, dateOfBirth) {
@@ -154,7 +182,7 @@ function createActivities (n = 100) {
 
 module.exports = () => {
   defaults.users = [...defaults.users, ...createUsers()]
-  defaults.activities = createActivities()
+  defaults.activities = [...defaults.activities, ...createActivities()]
   defaults.tokens = []
   return defaults
 }
